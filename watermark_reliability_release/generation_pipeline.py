@@ -182,9 +182,11 @@ def main(args):
         gen_kwargs.update(dict(num_beams=args.num_beams))
 
     generate_without_watermark = partial(model.generate, **gen_kwargs)
-    generate_with_watermark = partial(
+    generate_with_kirchenbauer_watermark = partial(
         model.generate, logits_processor=LogitsProcessorList([watermark_processor]), **gen_kwargs
     )
+
+    generate_with_soft_watermark
 
     # construct the collator
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer, padding=True, pad_to_multiple_of=8)
