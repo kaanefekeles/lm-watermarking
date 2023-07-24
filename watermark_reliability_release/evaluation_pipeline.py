@@ -56,6 +56,7 @@ from utils.evaluation import (
     compute_detect_retrieval,
     load_tokenizer,
     concat_rows,
+    compute_soft_wm_evaluations
 )
 
 #No need
@@ -354,6 +355,22 @@ def main(args):
 
     else:
         gen_table_w_zscore_ds = gen_table_w_ppl_ds
+
+    ###########################################################################
+    # SOFT WATERMARKING zscore evaluation
+    ###########################################################################
+
+    if "soft" in args.evaluation_metrics:
+        tokenizer = load_tokenizer(args)
+        compute_soft_wm_evaluations_partial = partial(
+            compute_soft_wm_evaluations,
+            tokenizer = tokenizer,
+            args=args
+        )
+
+        gen_table_w_zscore_ds = gen_table_w_zscore_ds.map(
+            compute_soft_wm_evaluations_partial, **map_setup, desc="Computing SOFT z-scores"
+        )
 
     ###########################################################################
     # Windowed z-score evaluation
@@ -1288,6 +1305,12 @@ if __name__ == "__main__":
         type=str2bool,
         default=True,
         help="Whether to log the raw tabular metric data to wandb.",
+    )
+    parser.add_argument(
+        "--soft_watermark_context_size",
+        type=int,
+        default=2,
+        help="How many past tokens will be considered to compute the secret number for soft watermarking.",
     )
     args = parser.parse_args()
 
