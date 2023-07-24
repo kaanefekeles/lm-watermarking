@@ -83,7 +83,8 @@ SUPPORTED_METRICS = [
 OUTPUT_TEXT_COLUMN_NAMES = [
     "baseline_completion",
     "no_wm_output",
-    "w_wm_output",
+    "w_kirchenbauer_wm_output",
+    "w_soft_wm_output",
     "w_wm_output_attacked",
 ]
 
@@ -95,12 +96,31 @@ REPETITION_TEXT_COLUMN_NAMES = OUTPUT_TEXT_COLUMN_NAMES
 COHERENCE_TEXT_COLUMN_NAMES = ["truncated_input"] + OUTPUT_TEXT_COLUMN_NAMES
 
 # These are the column pairs we want to compute p-sp for
+
+#Uptating this list since we modified the column names
+
+#OUTPUT_TEXT_PAIR_COLUMN_NAMES = [
+#    ["baseline_completion", "no_wm_output"],
+#    ["baseline_completion", "w_wm_output"],
+#    ["baseline_completion", "w_wm_output_attacked"],
+#    ["no_wm_output", "w_wm_output"],
+#    ["w_wm_output", "w_wm_output_attacked"],
+#]
+
+
 OUTPUT_TEXT_PAIR_COLUMN_NAMES = [
     ["baseline_completion", "no_wm_output"],
-    ["baseline_completion", "w_wm_output"],
-    ["baseline_completion", "w_wm_output_attacked"],
-    ["no_wm_output", "w_wm_output"],
-    ["w_wm_output", "w_wm_output_attacked"],
+
+    ["baseline_completion", "w_kirchenbauer_wm_output"],
+    ["no_wm_output", "w_kirchenbauer_wm_output"],
+
+    ["baseline_completion", "w_soft_wm_output"],
+    ["no_wm_output", "w_soft_wm_output"],
+
+    ["w_kirchenbauer_wm_output", "w_soft_wm_output"],
+    
+    #["baseline_completion", "w_wm_output_attacked"],
+    #["w_wm_output", "w_wm_output_attacked"],
 ]
 
 P_SP_TEXT_PAIR_COLUMN_NAMES = OUTPUT_TEXT_PAIR_COLUMN_NAMES
