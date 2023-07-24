@@ -188,6 +188,7 @@ def main(args):
         model.generate, logits_processor=LogitsProcessorList([watermark_processor]), **gen_kwargs
     )
 
+
     from soft_watermark_processor import soft_watermark_processor
 
     soft_watermark_lp = soft_watermark_processor(device=device, sample_count= args.soft_watermark_sample_count , context_size= args.soft_watermark_context_size)
@@ -195,6 +196,7 @@ def main(args):
     generate_with_soft_watermark = partial(
         model.generate, logits_processor=LogitsProcessorList([soft_watermark_lp]), **gen_kwargs
     )
+
 
     # construct the collator
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer, padding=True, pad_to_multiple_of=8)
