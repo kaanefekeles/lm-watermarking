@@ -77,6 +77,7 @@ SUPPORTED_METRICS = [
     "mauve",
     "detect-retrieval",
     "detectgpt",
+    "soft"
 ]
 
 # These are the output text columns we want to compute metrics on
@@ -86,6 +87,12 @@ OUTPUT_TEXT_COLUMN_NAMES = [
     "w_kirchenbauer_wm_output",
     "w_soft_wm_output",
     "w_wm_output_attacked",
+]
+
+SOFT_ZSCORE_TEXT_COLUMN_NAMES = [
+    "baseline_completion",
+    "no_wm_output",
+    "w_soft_wm_output",
 ]
 
 # etc for other evaluation types
@@ -261,6 +268,53 @@ def compute_z_score(
     example.update(score_dict)
     return example
 
+import scipy
+from scipy.stats import chisquare
+from soft_watermark_processor import secret_number_generator
+def compute_soft_wm_evaluation(example, text_column_name, tokenizer, args):
+    candidate_text = example[text_column_name]
+    encoded_text = tokenizer.encode(candidate_text)
+    secret_numbers = []
+    respective_tokens = []
+    for i in range(len(encoded_text)):
+        context = encoded_text[i-args.soft_watermark_context_size:i]
+        secret_numbers.append(secret_number_generator(context, encoded_text[i]))
+        respective_tokens.append(tokenizer.decode(encoded_text[i]))
+
+    secret_number_mean = np.mean(secret_numbers)
+    expected_mean = 0.5
+    expected_variance = 1/(12*len(secret_numbers))
+
+    z = (secret_number_mean - expected_mean)/np.sqrt(expected_variance)
+    z_pval = scipy.stats.norm.sf(z)
+
+    hist, bin_edges = np.histogram(secret_numbers, bins=20)
+    chi, chi_pval = chisquare(hist)
+
+    if z > 4:
+        z_score_detection_4 = 1
+    else:
+        z_score_detection_4 = 0
+    score_dict =  {"secret_numbers":np.array(secret_numbers),
+            "respective_tokens":np.array(respective_tokens),
+            "secret_number_mean": secret_number_mean,
+            "z_score":z,
+            "z_score_p_value": z_pval,
+            "chi_stat":chi,
+            "chi_stat_p_value": chi_pval,
+            "z_score_detection_4": z_score_detection_4,
+            "token_count": len(secret_numbers)
+            }
+
+    score_dict = {
+        text_column_name
+        + (f"SOFT_win{args.soft_watermark_context_size}")
+        + "_"
+        + k: v
+        for k, v in score_dict.items()
+    }
+    example.update(score_dict)
+    return example
 
 def compute_z_scores(example, watermark_detector=None, args=None):
     # this just iterates the z-score function over the columns we want to compute z-scores for
@@ -271,6 +325,14 @@ def compute_z_scores(example, watermark_detector=None, args=None):
             )
     return example
 
+def compute_soft_wm_evaluations(example,tokenizer, args=None):
+    # this just iterates the z-score function over the columns we want to compute z-scores for
+    for col_name in SOFT_ZSCORE_TEXT_COLUMN_NAMES:
+        if col_name in example:
+            example = compute_soft_wm_evaluation(
+                example, tokenizer=tokenizer, text_column_name=col_name, args=args
+            )
+    return example
 
 def compute_windowed_z_scores(example, watermark_detector=None, args=None):
     # this iterates the z-score function over the columns we want to compute z-scores for
