@@ -14,7 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from types import NoneType
+#Faulty import, does not work
+#from types import NoneType
+NoneType = type(None)
+
 
 from typing import Union
 import os
@@ -55,7 +58,8 @@ from utils.evaluation import (
     concat_rows,
 )
 
-print(f"Current huggingface cache dir: {os.environ['HF_HOME']}")
+#No need
+#print(f"Current huggingface cache dir: {os.environ['HF_HOME']}")
 
 from datasets import disable_caching
 
@@ -373,7 +377,13 @@ def main(args):
     # run-len-chisqrd evaluation
     ###########################################################################
     if "run-len-chisqrd" in args.evaluation_metrics:
-        assert "w_wm_output_green_token_mask" in gen_table_w_windowed_zscore_ds.column_names, (
+        print(gen_table_w_windowed_zscore_ds.column_names)
+        #old assertion
+        #assert "w_wm_output_green_token_mask" in gen_table_w_windowed_zscore_ds.column_names, (
+        #    f"Currently, run-len-chisqrd metric requires the green token masks to be computed previously "
+        #    f"by one of the z-score metrics."
+        #)
+        assert "w_kirchenbauer_wm_output_green_token_mask" in gen_table_w_windowed_zscore_ds.column_names, (
             f"Currently, run-len-chisqrd metric requires the green token masks to be computed previously "
             f"by one of the z-score metrics."
         )
@@ -444,6 +454,11 @@ def main(args):
     # Retrieval detection
     ###########################################################################
 
+
+    #Baya kod değiştirmek lazım şimdilik sildim
+    args.evaluation_metrics.remove('detect-retrieval')
+
+    
     if "detect-retrieval" in args.evaluation_metrics:
         print(f"Computing detect retrieval")
         gen_table_w_detect_retrieval_ds = compute_detect_retrieval(gen_table_w_mauve_ds, args=args)
