@@ -20,7 +20,9 @@ from functools import partial
 from tqdm import tqdm
 import wandb
 
-print(f"Current huggingface cache dir: {os.environ['HF_HOME']}")
+
+#print(f"Current huggingface cache dir: {os.environ['HF_HOME']}")
+#HF_HOME diye global bir değişken istiyor kullanmasak direk var olan cacheden alacak galiba
 
 # HF classses
 from transformers import LogitsProcessorList, DataCollatorWithPadding
@@ -186,7 +188,15 @@ def main(args):
         model.generate, logits_processor=LogitsProcessorList([watermark_processor]), **gen_kwargs
     )
 
-    generate_with_soft_watermark
+
+    from soft_watermark_processor import soft_watermark_processor
+
+    soft_watermark_lp = soft_watermark_processor(device=device, sample_count= args.soft_watermark_sample_count , context_size= args.soft_watermark_context_size)
+
+    generate_with_soft_watermark = partial(
+        model.generate, logits_processor=LogitsProcessorList([soft_watermark_lp]), **gen_kwargs
+    )
+
 
     # construct the collator
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer, padding=True, pad_to_multiple_of=8)
@@ -195,7 +205,8 @@ def main(args):
         generate,
         data_collator=data_collator,
         generate_without_watermark=generate_without_watermark,
-        generate_with_watermark=generate_with_watermark,
+        generate_with_kirchenbauer_watermark=generate_with_kirchenbauer_watermark,
+        generate_with_soft_watermark = generate_with_soft_watermark,
         watermark_processor=watermark_processor,
         tokenizer=tokenizer,
         device=device,
@@ -250,7 +261,9 @@ def main(args):
             print(f"prompt_length: {ex['prompt_length']}")
             print(f"real_completion_length: {ex['baseline_completion_length']}")
             print(f"no_wm_output_length: {ex['no_wm_output_length']}")
-            print(f"w_wm_output_length: {ex['w_wm_output_length']}")
+
+            print(f"w_kirchenbauer_wm_output_length: {ex['w_kirchenbauer_wm_output_length']}")
+            print(f"w_soft_wm_output_length: {ex['w_soft_wm_output_length']}")
 
             print(f"\ntruncated_input: ")
             print(ex["truncated_input"])
@@ -258,8 +271,11 @@ def main(args):
             print(ex["baseline_completion"])
             print(f"\nno_wm_output: ")
             print(ex["no_wm_output"])
-            print(f"\nw_wm_output: ")
-            print(ex["w_wm_output"])
+            print(f"\w_kirchenbauer_wm_output: ")
+            print(ex["w_kirchenbauer_wm_output"])
+
+            print(f"\w_soft_wm_output: ")
+            print(ex["w_soft_wm_output"])
 
         processed_examples.append(ex)
 
@@ -582,6 +598,20 @@ if __name__ == "__main__":
         type=str2bool,
         default=False,
         help="Allow overwriting of old generation files at the same output location.",
+    )
+
+    ## Soft watermarking parameters
+    parser.add_argument(
+        "--soft_watermark_context_size",
+        type=int,
+        default=2,
+        help="How many past tokens will be considered to compute the secret number for soft watermarking.",
+    )
+    parser.add_argument(
+        "--soft_watermark_sample_count",
+        type=int,
+        default=5,
+        help="How many candidate samplings will be done to find the one with highest secret number.",
     )
     args = parser.parse_args()
 
