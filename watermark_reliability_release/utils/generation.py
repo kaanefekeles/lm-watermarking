@@ -250,11 +250,13 @@ def check_input_lengths(
 def check_output_lengths(example, min_output_len=0):
     # FIXME, maybe should check baseline completion length too
     no_wm_output_len = example["no_wm_output_length"]
-    w_wm_output_len = example["w_wm_output_length"]
+    w_kirchenbauer_wm_output_length = example["w_kirchenbauer_wm_output_length"]
+    w_soft_wm_output_length = example["w_soft_wm_output_length"]
     conds = all(
         [
             no_wm_output_len >= min_output_len,
-            w_wm_output_len >= min_output_len,
+            w_kirchenbauer_wm_output_length >= min_output_len,
+            w_soft_wm_output_length >= min_output_len
         ]
     )
     return conds
@@ -451,7 +453,8 @@ def generate(
     examples,
     data_collator=None,
     generate_without_watermark=None,
-    generate_with_watermark=None,
+    generate_with_kirchenbauer_watermark=None,
+    generate_with_soft_watermark=None,
     watermark_processor=None,
     tokenizer=None,
     device=None,
@@ -466,27 +469,41 @@ def generate(
 
         if args.generation_seed is not None:
             torch.manual_seed(args.generation_seed)
-        output_with_watermark = generate_with_watermark(input_ids=input_ids)
+        output_with_kirchenbauer_watermark = generate_with_kirchenbauer_watermark(input_ids=input_ids)
+
+        if args.generation_seed is not None:
+            torch.manual_seed(args.generation_seed)
+        output_with_soft_watermark = generate_with_soft_watermark(input_ids=input_ids)
 
     if args.is_decoder_only_model:
         # need to isolate the newly generated tokens
         output_without_watermark = output_without_watermark[:, input_ids.shape[-1] :]
-        output_with_watermark = output_with_watermark[:, input_ids.shape[-1] :]
+        output_with_kirchenbauer_watermark = output_with_kirchenbauer_watermark[:, input_ids.shape[-1] :]
+        output_with_soft_watermark = output_with_soft_watermark[:, input_ids.shape[-1] :]
 
     decoded_output_without_watermark = tokenizer.batch_decode(
         output_without_watermark, skip_special_tokens=True
     )
-    decoded_output_with_watermark = tokenizer.batch_decode(
-        output_with_watermark, skip_special_tokens=True
+    decoded_output_with_kirchenbauer_watermark = tokenizer.batch_decode(
+        output_with_kirchenbauer_watermark, skip_special_tokens=True
+    )
+    decoded_output_with_soft_watermark = tokenizer.batch_decode(
+        output_with_soft_watermark, skip_special_tokens=True
     )
     examples.update(
         {
             "no_wm_output": decoded_output_without_watermark,
-            "w_wm_output": decoded_output_with_watermark,
+            "w_kirchenbauer_wm_output": decoded_output_with_kirchenbauer_watermark,
             "no_wm_output_length": (output_without_watermark != tokenizer.pad_token_id)
             .sum(dim=-1)
             .tolist(),
-            "w_wm_output_length": (output_with_watermark != tokenizer.pad_token_id)
+
+            "w_kirchenbauer_wm_output_length": (output_with_kirchenbauer_watermark != tokenizer.pad_token_id)
+            .sum(dim=-1)
+            .tolist(),
+
+            "w_soft_wm_output": decoded_output_with_soft_watermark,
+            "w_soft_wm_output_length": (output_with_soft_watermark != tokenizer.pad_token_id)
             .sum(dim=-1)
             .tolist(),
         }
@@ -496,7 +513,7 @@ def generate(
         examples["spike_entropies"] = watermark_processor._get_and_clear_stored_spike_ents()
         examples["spike_entropies"] = [
             ents[:num_toks]
-            for ents, num_toks in zip(examples["spike_entropies"], examples["w_wm_output_length"])
+            for ents, num_toks in zip(examples["spike_entropies"], examples["w_kirchenbauer_wm_output_length"])
         ]
 
     return examples
