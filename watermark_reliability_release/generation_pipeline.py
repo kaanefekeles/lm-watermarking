@@ -282,11 +282,11 @@ def main(args):
         if output_check(ex):
             i += 1
             pbar.update(1)
-        else:
-            print(
-                f"\n{i} of {len(processed_examples)} rows were satisfactory so far, {round(i/args.min_generations, 2)} of total.",
-                f"\nCurrent generation overhead ratio: {round(len(processed_examples)/(i+1), 3)}.",
-            )
+        #else:
+        print(
+            f"\n{i} of {len(processed_examples)} rows were satisfactory so far, {round(i/args.min_generations, 2)} of total.",
+            f"\nCurrent generation overhead ratio: {round(len(processed_examples)/(i+1), 3)}.",
+        )
         # if using wandb, log progress to wandb
         if args.wandb:
             run.log(
