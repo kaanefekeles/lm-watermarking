@@ -182,7 +182,6 @@ def main(args):
         )
     else:
         gen_kwargs.update(dict(num_beams=args.num_beams))
-
     generate_without_watermark = partial(model.generate, **gen_kwargs)
     generate_with_kirchenbauer_watermark = partial(
         model.generate, logits_processor=LogitsProcessorList([watermark_processor]), **gen_kwargs
@@ -191,10 +190,13 @@ def main(args):
 
     from soft_watermark_processor import soft_watermark_processor
 
+    soft_watermark_gen_kwargs = gen_kwargs.copy()
+    #soft watermarking auto does sampling
+    soft_watermark_gen_kwargs['do_sample'] = False
     soft_watermark_lp = soft_watermark_processor(device=device, sample_count= args.soft_watermark_sample_count , context_size= args.soft_watermark_context_size)
 
     generate_with_soft_watermark = partial(
-        model.generate, logits_processor=LogitsProcessorList([soft_watermark_lp]), **gen_kwargs
+        model.generate, logits_processor=LogitsProcessorList([soft_watermark_lp]), **soft_watermark_gen_kwargs
     )
 
 
