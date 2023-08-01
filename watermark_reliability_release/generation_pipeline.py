@@ -194,6 +194,12 @@ def main(args):
     if not args.use_sampling:
         print("Soft watermarking has to do sampling to work. Beam search not implemented yet.")
         #soft watermarking auto does sampling so no need to pass in the "do_sample" parameter
+    soft_watermark_gen_kwargs = gen_kwargs.copy()
+    soft_watermark_gen_kwargs.pop("do_sample")
+    soft_watermark_gen_kwargs.pop("top_k")
+    soft_watermark_gen_kwargs.pop("top_p")
+    soft_watermark_gen_kwargs.pop("typical_p")
+    soft_watermark_gen_kwargs.pop("temperature")
 
     soft_watermark_lp = soft_watermark_processor(device=device, sample_count= args.soft_watermark_sample_count , context_size= args.soft_watermark_context_size)
 
@@ -207,7 +213,7 @@ def main(args):
     )
 
     generate_with_soft_watermark = partial(
-        model.generate, logits_processor=logits_processor_list,
+        model.generate, logits_processor=logits_processor_list, **soft_watermark_gen_kwargs
     )
 
 
