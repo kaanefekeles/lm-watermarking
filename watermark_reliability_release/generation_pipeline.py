@@ -190,13 +190,24 @@ def main(args):
 
     from soft_watermark_processor import soft_watermark_processor
 
-    soft_watermark_gen_kwargs = gen_kwargs.copy()
-    #soft watermarking auto does sampling
-    soft_watermark_gen_kwargs['do_sample'] = False
+    from transformers import TopKLogitsWarper, TopPLogitsWarper, TemperatureLogitsWarper, TypicalLogitsWarper 
+    if not args.use_sampling:
+        print("Soft watermarking has to do sampling to work. Beam search not implemented yet.")
+        #soft watermarking auto does sampling so no need to pass in the "do_sample" parameter
+
     soft_watermark_lp = soft_watermark_processor(device=device, sample_count= args.soft_watermark_sample_count , context_size= args.soft_watermark_context_size)
 
+    #SOFT WATERMARKING LOGIT PROCESSOR HAS TO BE APPLIED LAST, that is why i am forcing the order and not passing in the relevant parameters like topk or topp
+    #other logits processors' orders dont matter but watermarking lp has to be applied last
+    logits_processor_list = LogitsProcessorList([TemperatureLogitsWarper(temperature = args.sampling_temp),
+                                                 TypicalLogitsWarper(mass=args.typical_p),
+                                                 TopKLogitsWarper(top_k=args.top_k),
+                                                 TopPLogitsWarper(top_p = args.top_p),
+                                                 soft_watermark_lp]
+    )
+    
     generate_with_soft_watermark = partial(
-        model.generate, logits_processor=LogitsProcessorList([soft_watermark_lp]), **soft_watermark_gen_kwargs
+        model.generate, logits_processor=logits_processor_list,
     )
 
 
