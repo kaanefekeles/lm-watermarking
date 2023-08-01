@@ -199,13 +199,13 @@ def main(args):
 
     #SOFT WATERMARKING LOGIT PROCESSOR HAS TO BE APPLIED LAST, that is why i am forcing the order and not passing in the relevant parameters like topk or topp
     #other logits processors' orders dont matter but watermarking lp has to be applied last
+    #typical_p sampling does not work with soft watermarking and will be ignored
     logits_processor_list = LogitsProcessorList([TemperatureLogitsWarper(temperature = args.sampling_temp),
-                                                 TypicalLogitsWarper(mass=args.typical_p),
                                                  TopKLogitsWarper(top_k=args.top_k),
                                                  TopPLogitsWarper(top_p = args.top_p),
                                                  soft_watermark_lp]
     )
-    
+
     generate_with_soft_watermark = partial(
         model.generate, logits_processor=logits_processor_list,
     )
