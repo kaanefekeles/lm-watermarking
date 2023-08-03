@@ -86,13 +86,15 @@ OUTPUT_TEXT_COLUMN_NAMES = [
     "no_wm_output",
     "w_kirchenbauer_wm_output",
     "w_soft_wm_output",
-    "w_wm_output_attacked",
+    "w_kirchenbauer_wm_output_attacked",
+    "w_soft_wm_output_attacked",
 ]
 
 SOFT_ZSCORE_TEXT_COLUMN_NAMES = [
     "baseline_completion",
     "no_wm_output",
     "w_soft_wm_output",
+    "w_soft_wm_output_attacked"
 ]
 
 # etc for other evaluation types
@@ -126,8 +128,12 @@ OUTPUT_TEXT_PAIR_COLUMN_NAMES = [
 
     ["w_kirchenbauer_wm_output", "w_soft_wm_output"],
     
-    #["baseline_completion", "w_wm_output_attacked"],
-    #["w_wm_output", "w_wm_output_attacked"],
+    ["baseline_completion", "w_kirchenbauer_wm_output_attacked"],
+    ["baseline_completion", "w_soft_wm_output_attacked"],
+
+    ["w_soft_wm_output", "w_soft_wm_output_attacked"],
+    ["w_kirchenbauer_wm_output", "w_kirchenbauer_wm_output_attacked"],
+
 ]
 
 P_SP_TEXT_PAIR_COLUMN_NAMES = OUTPUT_TEXT_PAIR_COLUMN_NAMES
@@ -145,8 +151,8 @@ ROC_TEST_STAT_SUFFIXES = [
     "detectgpt_score_100_d",
 ]
 
-FILTER_BY_COLUMNS = ["baseline_completion", "no_wm_output", "w_wm_output"]
-
+#FILTER_BY_COLUMNS = ["baseline_completion", "no_wm_output", "w_wm_output"]
+FILTER_BY_COLUMNS = ["baseline_completion", "no_wm_output", "w_kirchenbauer_wm_output", "w_soft_wm_output"]
 
 def concat_rows(examples, tokenizer=None, args=None):
     # concat the rows (there will be k rows per example)

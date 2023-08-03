@@ -1,0 +1,1 @@
+python evaluation_pipeline.py --evaluation_metrics=detectgpt --run_name=run_eval --wandb=False --input_dir=outdirt_eval --output_dir=outdirt_eval_detectgpt --roc_test_stat=all

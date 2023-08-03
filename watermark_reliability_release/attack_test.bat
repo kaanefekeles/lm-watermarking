@@ -1,0 +1,2 @@
+python attack_pipeline.py --attack_method=copy-paste --run_name="outdirt"_gpt_attack --wandb=False --input_dir=outdirt --verbose=True --cp_attack_src_col=w_soft_wm_output 
+python attack_pipeline.py --attack_method=copy-paste --run_name="outdirt"_gpt_attack --wandb=False --input_dir=outdirt --verbose=True --cp_attack_src_col=w_kirchenbauer_wm_output --overwrite_output_file=True

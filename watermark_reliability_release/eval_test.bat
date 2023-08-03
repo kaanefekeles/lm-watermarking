@@ -1,1 +1,1 @@
-python evaluation_pipeline.py --evaluation_metrics=all --run_name=run_eval --wandb=False --input_dir=outdirt --output_dir=outdirt --roc_test_stat=all
+python evaluation_pipeline.py --evaluation_metrics=all --run_name=run_eval --wandb=False --input_dir=outdirt --output_dir=outdirt_eval --roc_test_stat=all

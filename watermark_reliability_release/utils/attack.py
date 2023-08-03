@@ -93,12 +93,14 @@ def dipper_attack(dataset, lex=None, order=None, args=None):
 def check_output_column_lengths(example, min_len=0):
     baseline_completion_len = example["baseline_completion_length"]
     no_wm_output_len = example["no_wm_output_length"]
-    w_wm_output_len = example["w_wm_output_length"]
+    w_kirchenbauer_wm_output_length = example["w_kirchenbauer_wm_output_length"]
+    w_soft_wm_output_length = example["w_soft_wm_output_length"]
     conds = all(
         [
             baseline_completion_len >= min_len,
             no_wm_output_len >= min_len,
-            w_wm_output_len >= min_len,
+            w_kirchenbauer_wm_output_length >= min_len,
+            w_soft_wm_output_length >= min_len,
         ]
     )
     return conds
