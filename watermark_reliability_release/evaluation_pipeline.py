@@ -473,7 +473,8 @@ def main(args):
 
 
     #Baya kod değiştirmek lazım şimdilik sildim
-    args.evaluation_metrics.remove('detect-retrieval')
+    if 'detect-retrieval' in args.evaluation_metrics:
+        args.evaluation_metrics.remove('detect-retrieval')
 
     
     if "detect-retrieval" in args.evaluation_metrics:

@@ -36,7 +36,7 @@ from utils.attack import (
     scramble_attack,
 )
 
-print(f"Current huggingface cache dir: {os.environ['HF_HOME']}")
+#print(f"Current huggingface cache dir: {os.environ['HF_HOME']}")
 
 
 def main(args):

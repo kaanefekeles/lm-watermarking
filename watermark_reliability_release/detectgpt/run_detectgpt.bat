@@ -1,0 +1,2 @@
+
+python detectgpt_main.py --n_perturbation_list=100,100 --do_chunk --base_model_name="facebook/opt-125m" --mask_filling_model_name="t5-3b" --filter='null' --data_path=C:\Users\kaane\Desktop\lm-watermarking\watermark_reliability_release\outdirt\gen_table.jsonl
