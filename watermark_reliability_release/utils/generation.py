@@ -52,7 +52,7 @@ def load_model(args):
     elif args.is_decoder_only_model:
         if args.load_fp16:
             model = AutoModelForCausalLM.from_pretrained(
-                args.model_name_or_path, torch_dtype=torch.float16, device_map="auto"
+                args.model_name_or_path, torch_dtype=torch.float16, device_map="auto", use_auth_token = True
             )
         elif args.load_4bit:
             model = AutoModelForCausalLM.from_pretrained(
@@ -66,6 +66,8 @@ def load_model(args):
     if args.use_gpu:
         device = "cuda" if torch.cuda.is_available() else "cpu"
         if args.load_fp16:
+            pass
+        if args.load_4bit:
             pass
         else:
             model = model.to(device)
