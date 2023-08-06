@@ -54,6 +54,10 @@ def load_model(args):
             model = AutoModelForCausalLM.from_pretrained(
                 args.model_name_or_path, torch_dtype=torch.float16, device_map="auto"
             )
+        elif args.load_4bit:
+            model = AutoModelForCausalLM.from_pretrained(
+                args.model_name_or_path, load_in_4bit = True
+            )
         else:
             model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path)
     else:

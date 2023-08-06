@@ -382,7 +382,14 @@ if __name__ == "__main__":
         "--load_fp16",
         type=str2bool,
         default=True,
-        help="Whether to run model in float16 precsion.",
+        help="Whether to run model in float16 precision.",
+    )
+
+    parser.add_argument(
+        "--load_4bit",
+        type=str2bool,
+        default=False,
+        help="Whether to run model in FP4 precision.",
     )
     parser.add_argument(
         "--use_gpu",
