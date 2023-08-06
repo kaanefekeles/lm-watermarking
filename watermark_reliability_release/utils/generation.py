@@ -56,7 +56,7 @@ def load_model(args):
             )
         elif args.load_4bit:
             model = AutoModelForCausalLM.from_pretrained(
-                args.model_name_or_path, load_in_4bit = True
+                args.model_name_or_path, load_in_4bit = True, use_auth_token = True
             )
         else:
             model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path)
