@@ -89,6 +89,11 @@ def load_model(args):
         model.config.pad_token_id = tokenizer.pad_token_id = 0  # unk
         model.config.bos_token_id = 1
         model.config.eos_token_id = 2
+    elif "gpt2" in args.model_name_or_path:
+        tokenizer = AutoTokenizer.from_pretrained(
+            args.model_name_or_path, padding_side=padding_side
+        )
+        tokenizer.pad_token = tokenizer.eos_token
     else:
         tokenizer = AutoTokenizer.from_pretrained(
             args.model_name_or_path, padding_side=padding_side
