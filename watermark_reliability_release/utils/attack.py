@@ -120,8 +120,8 @@ def copy_paste_attack(example, tokenizer=None, args=None):
     if not check_output_column_lengths(example, min_len=args.cp_attack_min_len):
         # # if not, copy the orig w_wm_output to w_wm_output_attacked
         # NOTE changing this to return "" so that those fail/we can filter out these examples
-        example["w_wm_output_attacked"] = ""
-        example["w_wm_output_attacked_length"] = 0
+        example[f"{args.cp_attack_dst_col}_attacked"] = ""
+        example[f"{args.cp_attack_dst_col}_attacked_length"] = 0
         return example
 
     # else, attack
