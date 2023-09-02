@@ -167,9 +167,9 @@ def copy_paste_attack(example, tokenizer=None, args=None):
     else:
         raise ValueError(f"Invalid attack type: {args.cp_attack_type}")
 
-    example["w_wm_output_attacked"] = tokenizer.batch_decode(
+    example[f"{args.cp_attack_dst_col}_attacked"] = tokenizer.batch_decode(
         [tokenized_attacked_output], skip_special_tokens=True
     )[0]
-    example["w_wm_output_attacked_length"] = len(tokenized_attacked_output)
+    example[f"{args.cp_attack_dst_col}_attacked_length"] = len(tokenized_attacked_output)
 
     return example
