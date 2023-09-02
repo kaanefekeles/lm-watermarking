@@ -263,11 +263,14 @@ def check_output_lengths(example, min_output_len=0):
     no_wm_output_len = example["no_wm_output_length"]
     w_kirchenbauer_wm_output_length = example["w_kirchenbauer_wm_output_length"]
     w_soft_wm_output_length = example["w_soft_wm_output_length"]
+    baseline_completion_length = example["baseline_completion_length"]
+
     conds = all(
         [
             no_wm_output_len >= min_output_len,
             w_kirchenbauer_wm_output_length >= min_output_len,
-            w_soft_wm_output_length >= min_output_len
+            w_soft_wm_output_length >= min_output_len,
+            baseline_completion_length >= min_output_len
         ]
     )
     return conds

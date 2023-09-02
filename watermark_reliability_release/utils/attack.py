@@ -137,6 +137,15 @@ def copy_paste_attack(example, tokenizer=None, args=None):
     tokenized_src = example[f"{args.cp_attack_src_col}_tokd"]
     min_token_count = min(len(tokenized_dst), len(tokenized_src))
 
+    if min_token_count - args.cp_attack_insertion_len < 0:
+        #fixes a very annoying bug that only occurs when the tokenizer bugs out!!
+        example[f"{args.cp_attack_dst_col}_attacked"] = ""
+        example[f"{args.cp_attack_dst_col}_attacked_length"] = 0
+        print(tokenizer.decode(tokenized_dst))
+        print(tokenizer.decode(tokenized_src))
+
+        return example
+
     if args.cp_attack_type == "single-single":  # 1-t
         tokenized_attacked_output = single_insertion(
             args.cp_attack_insertion_len,

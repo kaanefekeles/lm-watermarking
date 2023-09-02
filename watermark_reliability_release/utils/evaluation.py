@@ -319,6 +319,10 @@ def compute_soft_wm_evaluation(example, text_column_name, tokenizer, args):
         + k: v
         for k, v in score_dict.items()
     }
+    #to filter failed attacks
+    if candidate_text == "":
+        score_dict['z_score'] = np.nan
+
     example.update(score_dict)
     return example
 
