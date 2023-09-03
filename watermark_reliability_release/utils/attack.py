@@ -105,13 +105,15 @@ def check_output_column_lengths(example, min_len=0):
     )
     return conds
 
-
+import torch
 def tokenize_for_copy_paste(example, tokenizer=None, args=None):
     for text_col in OUTPUT_TEXT_COLUMN_NAMES:
         if text_col in example:
             example[f"{text_col}_tokd"] = tokenizer(
                 example[text_col], return_tensors="pt", add_special_tokens=False
-            )["input_ids"][0]
+            )["input_ids"][0].type(torch.int32)
+            ##typecast fixes a very weird bug caused by arrow
+            #dont know what causes it and how this fixes it but worked for me
     return example
 
 
